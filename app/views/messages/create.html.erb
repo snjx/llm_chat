@@ -1,2 +1,25 @@
-<h1>Messages#create</h1>
-<p>Find me in app/views/messages/create.html.erb</p>
+<%= turbo_stream.replace "messages" do %>
+  <div id="messages">
+    <% Message.order(:id).each do |m| %>
+      <div style="margin: .6rem 0; display: flex; <%= m.role == 'user' ? 'justify-content: flex-end;' : '' %>">
+        <div style="max-width: 75%; border-radius: 12px; padding: .6rem .8rem; white-space: pre-wrap; line-height: 1.5;
+          <%= m.role == 'user' ?
+              'background:#e8f0fe; border:1px solid #c6dafc;' :
+              'background:#f6f6f6; border:1px solid #e5e5e5;' %>">
+          <strong><%= m.role.capitalize %>:</strong>
+          <div><%= m.content %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@message || Message.new) do %>
+  <%= form_with model: Message.new, url: messages_path, data: { turbo: true } do |f| %>
+    <div style="display:flex; gap:.6rem;">
+      <%= f.text_area :content, rows: 3, placeholder: "メッセージを入力",
+          style: "flex:1; padding:.6rem; border-radius:8px; border:1px solid #ddd;" %>
+      <%= f.submit "送信", style: "padding:.6rem 1rem; border-radius:8px; border:1px solid #0b57d0; background:#0b57d0; color:white;" %>
+    </div>
+  <% end %>
+<% end %>

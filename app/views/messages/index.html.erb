@@ -1,2 +1,51 @@
-<h1>Messages#index</h1>
-<p>Find me in app/views/messages/index.html.erb</p>
+<div class="container" style="max-width: 800px; margin: 2rem auto; font-family: system-ui, sans-serif;">
+  <h1>llm_chat</h1>
+
+  <div id="chat-box" style="border: 1px solid #ddd; border-radius: 8px; padding: 1rem; height: 60vh; overflow-y: auto;">
+    <%= turbo_stream_from :messages %>
+    <div id="messages">
+      <% @messages.each do |m| %>
+        <div style="margin: .6rem 0; display: flex; <%= m.role == 'user' ? 'justify-content: flex-end;' : '' %>">
+          <div style="max-width: 75%; border-radius: 12px; padding: .6rem .8rem; white-space: pre-wrap; line-height: 1.5;
+            <%= m.role == 'user' ?
+                'background:#e8f0fe; border:1px solid #c6dafc;' :
+                'background:#f6f6f6; border:1px solid #e5e5e5;' %>">
+            <strong><%= m.role.capitalize %>:</strong>
+            <div><%= m.content %></div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <%= form_with model: @message, url: messages_path, data: { turbo: true } do |f| %>
+      <div style="display:flex; gap:.6rem;">
+        <%= f.text_area :content, rows: 3, placeholder: "メッセージを入力",
+            style: "flex:1; padding:.6rem; border-radius:8px; border:1px solid #ddd;" %>
+        <%= f.submit "送信", style: "padding:.6rem 1rem; border-radius:8px; border:1px solid #0b57d0; background:#0b57d0; color:white;" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  // 送信や受信のたびに最下部へスクロール
+  const box = document.getElementById("chat-box");
+  if (box) { box.scrollTop = box.scrollHeight; }
+
+  document.addEventListener("turbo:load", () => {
+    const box = document.getElementById("chat-box");
+    if (box) { box.scrollTop = box.scrollHeight; }
+  });
+
+  document.addEventListener("turbo:before-stream-render", () => {
+    const box = document.getElementById("chat-box");
+    if (box) { box.dataset.prevHeight = box.scrollHeight; }
+  });
+
+  document.addEventListener("turbo:render", () => {
+    const box = document.getElementById("chat-box");
+    if (box) { box.scrollTop = box.scrollHeight; }
+  });
+</script>
