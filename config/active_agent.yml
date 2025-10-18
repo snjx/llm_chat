@@ -1,0 +1,17 @@
+# config/active_agent.yml
+default: &default
+  provider: openai
+  providers:
+    openai:
+      api_key: <%= ENV.fetch("OPENAI_API_KEY", "not-needed") %>
+      base_url: <%= ENV.fetch("OPENAI_BASE_URL", "http://192.168.10.10:1234/v1") %>
+      chat_model: <%= ENV.fetch("OPENAI_CHAT_MODEL", "gpt-oss-20b") %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
